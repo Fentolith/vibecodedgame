@@ -1,0 +1,154 @@
+[gd_scene load_steps=14 format=3 uid="uid://testdung1"]
+
+[ext_resource type="PackedScene" uid="uid://player001" path="res://scenes/player/player.tscn" id="1_player"]
+[ext_resource type="PackedScene" uid="uid://hud00001" path="res://scenes/ui/hud.tscn" id="2_hud"]
+
+[sub_resource type="StandardMaterial3D" id="mat_floor"]
+albedo_color = Color(0.15, 0.12, 0.1, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="mat_wall"]
+albedo_color = Color(0.2, 0.18, 0.15, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="mat_ceiling"]
+albedo_color = Color(0.1, 0.08, 0.07, 1)
+roughness = 0.95
+
+[sub_resource type="BoxMesh" id="mesh_floor"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="BoxShape3D" id="shape_floor"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="BoxMesh" id="mesh_wall_ns"]
+size = Vector3(20, 4, 0.5)
+
+[sub_resource type="BoxShape3D" id="shape_wall_ns"]
+size = Vector3(20, 4, 0.5)
+
+[sub_resource type="BoxMesh" id="mesh_wall_ew"]
+size = Vector3(0.5, 4, 20)
+
+[sub_resource type="BoxShape3D" id="shape_wall_ew"]
+size = Vector3(0.5, 4, 20)
+
+[sub_resource type="BoxMesh" id="mesh_ceiling"]
+size = Vector3(20, 0.5, 20)
+
+[sub_resource type="BoxShape3D" id="shape_ceiling"]
+size = Vector3(20, 0.5, 20)
+
+[node name="TestDungeon" type="Node3D"]
+
+[node name="Player" parent="." instance=ExtResource("1_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="HUD" parent="." instance=ExtResource("2_hud")]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
+light_color = Color(0.3, 0.25, 0.2, 1)
+light_energy = 0.6
+shadow_enabled = true
+
+[node name="Floor" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+mesh = SubResource("mesh_floor")
+surface_material_override/0 = SubResource("mat_floor")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+shape = SubResource("shape_floor")
+
+[node name="WallNorth" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
+mesh = SubResource("mesh_wall_ns")
+surface_material_override/0 = SubResource("mat_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallNorth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
+shape = SubResource("shape_wall_ns")
+
+[node name="WallSouth" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
+mesh = SubResource("mesh_wall_ns")
+surface_material_override/0 = SubResource("mat_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallSouth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
+shape = SubResource("shape_wall_ns")
+
+[node name="WallEast" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 0)
+mesh = SubResource("mesh_wall_ew")
+surface_material_override/0 = SubResource("mat_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallEast"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 0)
+shape = SubResource("shape_wall_ew")
+
+[node name="WallWest" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="WallWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 0)
+mesh = SubResource("mesh_wall_ew")
+surface_material_override/0 = SubResource("mat_wall")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WallWest"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 0)
+shape = SubResource("shape_wall_ew")
+
+[node name="Ceiling" type="StaticBody3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ceiling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+mesh = SubResource("mesh_ceiling")
+surface_material_override/0 = SubResource("mat_ceiling")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ceiling"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
+shape = SubResource("shape_ceiling")
+
+[node name="TorchLight1" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -8)
+light_color = Color(1, 0.7, 0.3, 1)
+light_energy = 5.0
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="TorchLight2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
+light_color = Color(1, 0.7, 0.3, 1)
+light_energy = 5.0
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="TorchLight3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, 8)
+light_color = Color(1, 0.65, 0.25, 1)
+light_energy = 4.5
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="TorchLight4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 8)
+light_color = Color(1, 0.65, 0.25, 1)
+light_energy = 4.5
+omni_range = 10.0
+omni_attenuation = 1.2
+
+[node name="CenterLight" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+light_color = Color(0.9, 0.6, 0.3, 1)
+light_energy = 3.0
+omni_range = 14.0
+omni_attenuation = 1.5
