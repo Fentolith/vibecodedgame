@@ -31,5 +31,5 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
 billboard = 3
 no_depth_test = true
 font_size = 10
-text = "[E] Bag"
+text = "[F] Open Bag"
 modulate = Color(0.95, 0.82, 0.5, 1)

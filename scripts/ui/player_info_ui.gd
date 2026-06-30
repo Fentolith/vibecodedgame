@@ -5,6 +5,8 @@ const InventoryClass := preload("res://scripts/resources/inventory.gd")
 
 var _name_label:     Label = null
 var _class_label:    Label = null
+var _level_label:    Label = null
+var _xp_bar:         ProgressBar = null
 var _str_label:      Label = null
 var _dex_label:      Label = null
 var _con_label:      Label = null
@@ -44,6 +46,24 @@ func _build_ui() -> void:
 	_class_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_class_label.modulate = Color(0.75, 0.75, 0.75)
 	vbox.add_child(_class_label)
+
+	# Level + XP row
+	var level_row := HBoxContainer.new()
+	level_row.add_theme_constant_override("separation", 12)
+	vbox.add_child(level_row)
+
+	_level_label = Label.new()
+	_level_label.add_theme_font_size_override("font_size", 13)
+	_level_label.custom_minimum_size = Vector2(80, 0)
+	level_row.add_child(_level_label)
+
+	_xp_bar = ProgressBar.new()
+	_xp_bar.custom_minimum_size = Vector2(180, 18)
+	_xp_bar.show_percentage = false
+	var xp_style := StyleBoxFlat.new()
+	xp_style.bg_color = Color(0.9, 0.8, 0.1)
+	_xp_bar.add_theme_stylebox_override("fill", xp_style)
+	level_row.add_child(_xp_bar)
 
 	_add_separator(vbox)
 
@@ -158,6 +178,9 @@ func refresh() -> void:
 
 	_name_label.text  = GameManager.player_name if GameManager.player_name != "" else "Unknown"
 	_class_label.text = s.class_id.capitalize()
+	_level_label.text = "Level %d" % s.level
+	_xp_bar.max_value = s.xp_to_next
+	_xp_bar.value     = s.xp
 
 	# Attributes — show base (effective in red if debuffed)
 	_set_stat_label(_str_label, "STR", s.strength, p.get_effective_strength() if p else s.strength)

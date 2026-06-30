@@ -1,5 +1,8 @@
 extends CharacterBody3D
 
+const ProjectileScene := preload("res://scenes/entities/projectile.tscn")
+const RANGED_COOLDOWN := 0.5
+
 # ── Movement constants ──────────────────────────────────────────────────────
 const WALK_SPEED := 4.0
 const SPRINT_SPEED := 7.0
@@ -51,7 +54,8 @@ var is_thirsty: bool  = false
 # ── Combat state vars ───────────────────────────────────────────────────────
 var lmb_press_time: float    = 0.0   # when LMB was pressed
 var attack_cooldown_timer: float = 0.0
-var block_timer: float       = 0.0   # how long we've been holding block
+var block_timer: float       = 0.0
+var ranged_cooldown: float   = 0.0
 var is_blocking: bool        = false
 var parry_active: bool       = false
 
@@ -128,7 +132,7 @@ func _add_test_items() -> void:
 	sword.grid_size    = Vector2i(1, 3)
 	sword.weight       = 3.5
 	sword.rarity       = ItemClass.Rarity.COMMON
-	sword.item_type    = ItemClass.ItemType.WEAPON
+	sword.item_type    = ItemClass.ItemType.WEAPON_MELEE
 	sword.description  = "A basic iron sword."
 	GameManager.inventory.add_item(sword, Vector2i(2, 0))
 
@@ -138,7 +142,7 @@ func _add_test_items() -> void:
 	armor.grid_size    = Vector2i(2, 2)
 	armor.weight       = 5.0
 	armor.rarity       = ItemClass.Rarity.UNCOMMON
-	armor.item_type    = ItemClass.ItemType.ARMOR
+	armor.item_type    = ItemClass.ItemType.ARMOR_CHEST
 	armor.description  = "Light armor offering modest protection."
 	GameManager.inventory.add_item(armor, Vector2i(4, 0))
 
@@ -195,6 +199,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_player_info()
 	if event.is_action_pressed("toggle_camera"):
 		_toggle_camera()
+	if event.is_action_pressed("fire_ranged"):
+		_fire_projectile()
 
 # ───────────────────────────────────────────────────────────────────────────
 func _physics_process(delta: float) -> void:
@@ -206,10 +212,12 @@ func _physics_process(delta: float) -> void:
 	_handle_hunger_thirst(delta)
 	_handle_combat_timers(delta)
 
-	# Block timer tracks parry window
 	if is_blocking:
 		block_timer += delta
 		parry_active = block_timer < PARRY_WINDOW
+
+	if ranged_cooldown > 0.0:
+		ranged_cooldown -= delta
 
 	var is_sprinting := Input.is_action_pressed("sprint") and not is_crouching and stamina > 0.0
 
@@ -306,8 +314,8 @@ func receive_hit(damage: int, attacker: Node) -> void:
 		return
 
 	if parry_active:
-		print("PARRY SUCCESS — countered ", attacker.name)
-		# Future: stun attacker here
+		if attacker.has_method("take_damage"):
+			attacker.take_damage(5, "parry")
 		return
 
 	if is_blocking:
@@ -439,6 +447,15 @@ func gain_xp(amount: int) -> void:
 		heal(max_health)
 		GameManager.player_leveled_up.emit(s.level)
 	GameManager.player_xp_changed.emit(s.xp, s.xp_to_next)
+
+func _fire_projectile() -> void:
+	if state == State.DEAD or ranged_cooldown > 0.0:
+		return
+	ranged_cooldown = RANGED_COOLDOWN
+	var proj: Node3D = ProjectileScene.instantiate()
+	get_parent().add_child(proj)
+	proj.global_position = camera.global_position + camera.global_basis.z * -0.5
+	proj.direction       = -camera.global_basis.z
 
 func _die() -> void:
 	state = State.DEAD

@@ -29,10 +29,11 @@ var is_paused: bool = false
 # ── Loot tables ──────────────────────────────────────────────────────────────
 # Each entry: {id, display_name, weight, min_count, max_count, stackable, rarity, item_type}
 const LOOT_TABLES: Dictionary = {
+	# item_type integers: 8=CONSUMABLE, 11=MISC  (matches Item.ItemType enum)
 	"slime": [
-		{id="gold",         display_name="Gold",          weight=55, min=1, max=4,  stackable=true,  rarity=1, item_type=3, grid=Vector2i(1,1), desc="Coins dropped by a slime."},
-		{id="health_potion",display_name="Health Potion", weight=25, min=1, max=1,  stackable=false, rarity=0, item_type=2, grid=Vector2i(1,1), desc="Restores 10 HP."},
-		{id="nothing",      display_name="",              weight=20, min=0, max=0,  stackable=false, rarity=0, item_type=3, grid=Vector2i(1,1), desc=""},
+		{id="gold",         display_name="Gold",          weight=55, min=1, max=4,  stackable=true,  rarity=1, item_type=11, grid=Vector2i(1,1), desc="Coins dropped by a slime."},
+		{id="health_potion",display_name="Health Potion", weight=25, min=1, max=1,  stackable=false, rarity=0, item_type=8,  grid=Vector2i(1,1), desc="Restores 10 HP."},
+		{id="nothing",      display_name="",              weight=20, min=0, max=0,  stackable=false, rarity=0, item_type=11, grid=Vector2i(1,1), desc=""},
 	],
 }
 
@@ -128,7 +129,7 @@ func use_item(item: Resource) -> void:
 	if not player_node:
 		return
 	var it := item as ItemClass
-	if it.item_type == ItemClass.ItemType.CONSUMABLE:
+	if it.is_consumable():
 		if it.id == "health_potion":
 			player_node.heal(10.0)
 			inventory.remove_item(item)

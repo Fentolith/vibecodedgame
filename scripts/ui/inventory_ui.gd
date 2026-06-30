@@ -194,6 +194,17 @@ func _draw_grid_item(item: Resource, grid_pos: Vector2i) -> void:
 	add_child(rect)
 	_item_rects.append(rect)
 
+	# Icon (fills the slot, tinted slightly)
+	var icon_tex: ImageTexture = it.get_icon()
+	if icon_tex:
+		var icon_rect := TextureRect.new()
+		icon_rect.texture          = icon_tex
+		icon_rect.size             = rect.size
+		icon_rect.stretch_mode     = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon_rect.mouse_filter     = Control.MOUSE_FILTER_IGNORE
+		icon_rect.modulate         = Color(1, 1, 1, 0.55)
+		rect.add_child(icon_rect)
+
 	var name_lbl := Label.new()
 	name_lbl.text                = it.display_name
 	name_lbl.size                = rect.size
@@ -280,9 +291,9 @@ func _open_context_menu(item: Resource) -> void:
 	_context_item = item
 	_context_menu.clear()
 	var it := item as ItemClass
-	if it.item_type == ItemClass.ItemType.CONSUMABLE:
+	if it.is_consumable():
 		_context_menu.add_item("Use", 0)
-	if it.item_type == ItemClass.ItemType.WEAPON or it.item_type == ItemClass.ItemType.ARMOR:
+	if it.is_equippable():
 		_context_menu.add_item("Equip", 1)
 	_context_menu.add_item("Drop", 2)
 	_context_menu.popup(Rect2i(
@@ -313,6 +324,9 @@ func _on_context_id_pressed(id: int) -> void:
 	_context_item = null
 
 func _try_equip_to_slot(item: Resource, slot_name: String) -> void:
+	var it := item as ItemClass
+	if it.get_equipment_slot() != slot_name:
+		return
 	var old: Resource = GameManager.equipment.get_slot(slot_name)
 	if old:
 		_auto_place(old)
@@ -334,10 +348,7 @@ func _auto_place(item: Resource) -> void:
 				return
 
 func _slot_for_item(it: ItemClass) -> String:
-	match it.item_type:
-		ItemClass.ItemType.WEAPON: return "main_hand"
-		ItemClass.ItemType.ARMOR:  return "chest"
-	return ""
+	return it.get_equipment_slot()
 
 func _show_info(item: Resource) -> void:
 	var it           := item as ItemClass
