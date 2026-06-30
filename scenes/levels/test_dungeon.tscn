@@ -1,8 +1,9 @@
-[gd_scene load_steps=17 format=3 uid="uid://testdung1"]
+[gd_scene load_steps=19 format=3 uid="uid://testdung1"]
 
 [ext_resource type="PackedScene" uid="uid://player001" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://hud00001" path="res://scenes/ui/hud.tscn" id="2_hud"]
 [ext_resource type="PackedScene" uid="uid://slime001" path="res://scenes/entities/slime.tscn" id="3_slime"]
+[ext_resource type="Script" path="res://scripts/levels/test_dungeon.gd" id="4_dungscript"]
 
 [sub_resource type="StandardMaterial3D" id="mat_floor"]
 albedo_color = Color(0.15, 0.12, 0.1, 1)
@@ -40,12 +41,25 @@ size = Vector3(80, 0.5, 80)
 [sub_resource type="BoxShape3D" id="shape_ceiling"]
 size = Vector3(80, 0.5, 80)
 
+[sub_resource type="NavigationMesh" id="NavMesh_dungeon"]
+cell_size = 0.25
+cell_height = 0.25
+agent_height = 1.8
+agent_radius = 0.4
+agent_max_climb = 0.5
+agent_max_slope = 45.0
+geometry_parsed_geometry_type = 0
+
 [sub_resource type="Environment" id="Env_dungeon"]
 ambient_light_source = 2
 ambient_light_color = Color(0.55, 0.45, 0.35, 1)
 ambient_light_energy = 1.2
 
 [node name="TestDungeon" type="Node3D"]
+script = ExtResource("4_dungscript")
+
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="."]
+navigation_mesh = SubResource("NavMesh_dungeon")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Env_dungeon")

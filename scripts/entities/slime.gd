@@ -18,12 +18,18 @@ var wander_timer: float = 0.0
 var wander_target: Vector3 = Vector3.ZERO
 var gravity: float     = ProjectSettings.get_setting("physics/3d/default_gravity")
 
-@onready var health_bar: Label3D = $HealthBar
+@onready var health_bar: Label3D          = $HealthBar
+@onready var nav_agent:  NavigationAgent3D = $NavigationAgent3D
 
 func _ready() -> void:
 	health_bar.visible = false
-	wander_target      = _random_wander_point()
 	wander_timer       = randf_range(1.0, 3.0)
+	# Defer so global_position is valid after the node is placed in the scene tree
+	call_deferred("_init_wander")
+
+func _init_wander() -> void:
+	wander_target = _random_wander_point()
+	nav_agent.target_position = wander_target
 
 func _physics_process(delta: float) -> void:
 	if state == State.DEAD:
@@ -59,31 +65,54 @@ func _do_idle(delta: float) -> void:
 	if wander_timer <= 0.0:
 		wander_target = _random_wander_point()
 		wander_timer  = randf_range(2.0, 4.0)
-	_move_toward(wander_target, IDLE_SPEED)
+	nav_agent.target_position = wander_target
+	_move_via_nav(IDLE_SPEED)
 
 func _do_alert(player: Node3D) -> void:
 	if player:
-		_move_toward(player.global_position, CHASE_SPEED)
+		nav_agent.target_position = player.global_position
+		_move_via_nav(CHASE_SPEED)
 
 func _do_attack_tick(delta: float, player: Node3D) -> void:
 	if player:
-		_move_toward(player.global_position, CHASE_SPEED)
+		nav_agent.target_position = player.global_position
+		_move_via_nav(CHASE_SPEED)
 	attack_timer -= delta
 	if attack_timer <= 0.0:
 		attack_timer = ATTACK_COOLDOWN
 		if player and player.has_method("receive_hit"):
 			player.receive_hit(1, self)
 
-func _move_toward(target: Vector3, speed: float) -> void:
-	var dir := target - global_position
-	dir.y = 0.0
-	if dir.length() > 0.15:
-		dir = dir.normalized()
-		velocity.x = dir.x * speed
-		velocity.z = dir.z * speed
-	else:
+func _move_via_nav(speed: float) -> void:
+	var target: Vector3  = nav_agent.target_position
+	var flat_dist: float = Vector2(global_position.x - target.x, global_position.z - target.z).length()
+
+	if flat_dist < 0.5:
 		velocity.x = move_toward(velocity.x, 0.0, speed)
 		velocity.z = move_toward(velocity.z, 0.0, speed)
+		return
+
+	var dir: Vector3
+
+	# Try to get a useful direction from the nav agent
+	var next: Vector3     = nav_agent.get_next_path_position()
+	var nav_dir: Vector3  = next - global_position
+	nav_dir.y = 0.0
+
+	if nav_dir.length() > 0.2:
+		# Nav path is giving us a real next waypoint
+		dir = nav_dir.normalized()
+	else:
+		# Nav not ready or path empty — move directly toward target
+		var raw: Vector3 = target - global_position
+		raw.y = 0.0
+		if raw.length() > 0.1:
+			dir = raw.normalized()
+		else:
+			return
+
+	velocity.x = dir.x * speed
+	velocity.z = dir.z * speed
 
 func take_damage(amount: int, _attack_type: String = "") -> void:
 	if state == State.DEAD:
@@ -103,21 +132,13 @@ func _refresh_health_bar() -> void:
 
 func _die() -> void:
 	state = State.DEAD
-	GameManager.spawn_loot_at(global_position, _make_gold_drop())
+	var loot: Array = GameManager.roll_loot("slime")
+	if not loot.is_empty():
+		GameManager.spawn_loot_at(global_position, loot)
+	var player: Node = GameManager.player_node
+	if player and player.has_method("gain_xp"):
+		player.gain_xp(15)
 	queue_free()
-
-func _make_gold_drop() -> Array:
-	var gold      := ItemClass.new()
-	gold.id           = "gold"
-	gold.display_name = "Gold"
-	gold.grid_size    = Vector2i(1, 1)
-	gold.weight       = 0.01
-	gold.rarity       = ItemClass.Rarity.UNCOMMON
-	gold.item_type    = ItemClass.ItemType.MISC
-	gold.stackable    = true
-	gold.stack_count  = randi_range(1, 3)
-	gold.description  = "Shiny coins dropped by a slime."
-	return [gold]
 
 func _random_wander_point() -> Vector3:
 	return global_position + Vector3(randf_range(-4.0, 4.0), 0.0, randf_range(-4.0, 4.0))

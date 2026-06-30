@@ -77,14 +77,27 @@ var is_third_person: bool = false
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	hud = get_parent().get_node_or_null("HUD")
-	GameManager.create_player_stats()
+	var is_new_game: bool = not GameManager.stats
+	if is_new_game:
+		GameManager.create_player_stats()
 	GameManager.player_node = self
 	max_health = float(GameManager.stats.max_health)
 	max_mana   = float(GameManager.stats.max_mana)
-	health     = max_health
-	mana       = 0.0
+	if GameManager.player_health >= 0.0:
+		# Restoring state from previous floor
+		health  = GameManager.player_health
+		mana    = GameManager.player_mana
+		stamina = GameManager.player_stamina
+		hunger  = GameManager.player_hunger
+		thirst  = GameManager.player_thirst
+		is_hungry  = hunger <= 0.0
+		is_thirsty = thirst <= 0.0
+	else:
+		health  = max_health
+		mana    = 0.0
 	_emit_all_stats()
-	_add_test_items()
+	if is_new_game:
+		_add_test_items()
 
 func _add_test_items() -> void:
 	var ItemClass := preload("res://scripts/resources/item.gd")
@@ -133,6 +146,9 @@ func _emit_all_stats() -> void:
 	GameManager.player_health_changed.emit(health, max_health)
 	GameManager.player_mana_changed.emit(mana, max_mana)
 	GameManager.player_stamina_changed.emit(stamina, MAX_STAMINA)
+	var s := GameManager.stats
+	if s:
+		GameManager.player_xp_changed.emit(s.xp, s.xp_to_next)
 
 # ───────────────────────────────────────────────────────────────────────────
 func _input(event: InputEvent) -> void:
@@ -405,6 +421,24 @@ func drink(thirst_restore: float) -> void:
 	if thirst > 0.0 and is_thirsty:
 		is_thirsty = false
 		GameManager.player_needs_changed.emit("thirsty", false)
+
+func gain_xp(amount: int) -> void:
+	var s := GameManager.stats
+	if not s:
+		return
+	s.xp += amount
+	while s.xp >= s.xp_to_next and s.level < 12:
+		s.xp         -= s.xp_to_next
+		s.level      += 1
+		s.xp_to_next  = s.level * 80 + 20
+		# Stat increases per level (vary by class)
+		match GameManager.selected_class:
+			"fighter": max_health += 6; s.max_health += 6; s.strength += 1
+			"thief":   max_health += 4; s.max_health += 4; s.dexterity += 1
+			"wizard":  max_health += 2; s.max_health += 2; s.magic += 1; max_mana += 3; s.max_mana += 3
+		heal(max_health)
+		GameManager.player_leveled_up.emit(s.level)
+	GameManager.player_xp_changed.emit(s.xp, s.xp_to_next)
 
 func _die() -> void:
 	state = State.DEAD

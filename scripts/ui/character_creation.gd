@@ -51,4 +51,4 @@ func _update_start_button_enabled() -> void:
 func _on_start_pressed() -> void:
 	GameManager.player_name = name_edit.text.strip_edges()
 	GameManager.selected_class = selected_class
-	get_tree().change_scene_to_file("res://scenes/levels/test_dungeon.tscn")
+	get_tree().change_scene_to_file("res://scenes/levels/dungeon.tscn")

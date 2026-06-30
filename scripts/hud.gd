@@ -1,9 +1,12 @@
 extends CanvasLayer
 
-@onready var health_bar:        Control = $HealthOrb
-@onready var mana_bar:          Control = $ManaOrb
-@onready var stamina_bar:       ProgressBar        = $StaminaBar
-@onready var interact_label:    Label              = $InteractLabel
+@onready var health_bar:        Control     = $HealthOrb
+@onready var mana_bar:          Control     = $ManaOrb
+@onready var stamina_bar:       ProgressBar = $StaminaBar
+@onready var xp_bar:            ProgressBar = $XPBar
+@onready var level_label:       Label       = $LevelLabel
+@onready var level_up_label:    Label       = $LevelUpLabel
+@onready var interact_label:    Label       = $InteractLabel
 @onready var inventory_overlay: Control            = $InventoryOverlay
 @onready var map_overlay:       Control            = $MapOverlay
 @onready var esc_menu:          Control            = $EscMenu
@@ -14,6 +17,7 @@ extends CanvasLayer
 @onready var dev_tools_menu:    Control            = $DevToolsMenu
 @onready var controls_menu:     Control            = $ControlsMenu
 @onready var loot_overlay:      Control            = $LootOverlay
+@onready var floor_label:       Label              = $FloorLabel
 
 func _ready() -> void:
 	GameManager.player_health_changed.connect(_on_health_changed)
@@ -22,6 +26,10 @@ func _ready() -> void:
 	GameManager.player_needs_changed.connect(_on_needs_changed)
 	GameManager.player_died.connect(_on_player_died)
 	GameManager.loot_bag_opened.connect(_on_loot_bag_opened)
+	GameManager.player_xp_changed.connect(_on_xp_changed)
+	GameManager.player_leveled_up.connect(_on_leveled_up)
+	level_up_label.visible = false
+	floor_label.text = "Floor %d" % (GameManager.current_floor + 1)
 
 	interact_label.visible = false
 	esc_menu.get_node("VBoxContainer/ResumeButton").pressed.connect(toggle_esc_menu)
@@ -45,6 +53,15 @@ func _on_mana_changed(current: float, maximum: float) -> void:
 
 func _on_stamina_changed(current: float, maximum: float) -> void:
 	stamina_bar.value = (current / maximum) * 100.0
+
+func _on_xp_changed(xp: int, xp_to_next: int) -> void:
+	xp_bar.value = (float(xp) / float(xp_to_next)) * 100.0
+
+func _on_leveled_up(new_level: int) -> void:
+	level_label.text   = "Level %d" % new_level
+	level_up_label.visible = true
+	await get_tree().create_timer(2.0).timeout
+	level_up_label.visible = false
 
 func _on_needs_changed(need: String, is_active: bool) -> void:
 	if need == "hungry":
