@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://slime001"]
+
+[ext_resource type="Script" path="res://scripts/entities/slime.gd" id="1_slime"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_slime"]
+size = Vector3(0.65, 0.65, 0.65)
+
+[sub_resource type="BoxMesh" id="BoxMesh_slime"]
+size = Vector3(0.65, 0.65, 0.65)
+
+[sub_resource type="StandardMaterial3D" id="Mat_slime"]
+albedo_color = Color(0.12, 0.78, 0.18, 1)
+roughness = 0.5
+emission_enabled = true
+emission = Color(0.05, 0.28, 0.05, 1)
+emission_energy_multiplier = 0.4
+
+[node name="Slime" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_slime")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.325, 0)
+shape = SubResource("BoxShape3D_slime")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.325, 0)
+mesh = SubResource("BoxMesh_slime")
+surface_material_override/0 = SubResource("Mat_slime")
+
+[node name="HealthBar" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+visible = false
+billboard = 3
+no_depth_test = true
+font_size = 12
+text = "████████"
+modulate = Color(0.2, 0.95, 0.25, 1)

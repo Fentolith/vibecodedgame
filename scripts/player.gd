@@ -28,9 +28,9 @@ const PARRY_WINDOW      := 0.30   # first N seconds of blocking = active parry
 const ATTACK_COOLDOWN   := 0.50   # minimum time between any two attacks
 
 # Base damage per attack type (modified by STR and weapon later)
-const DMG_QUICK   := 5
-const DMG_REGULAR := 10
-const DMG_HEAVY   := 20
+const DMG_QUICK   := 1
+const DMG_REGULAR := 2
+const DMG_HEAVY   := 3
 
 # ── Player state ────────────────────────────────────────────────────────────
 enum State { IDLE, MOVING, ATTACKING, BLOCKING, STUNNED, DEAD }
@@ -66,20 +66,68 @@ var current_peek: float = 0.0
 @onready var interact_ray: RayCast3D   = $Head/Camera3D/InteractRay
 @onready var attack_ray: RayCast3D     = $Head/Camera3D/AttackRay
 @onready var weapon: Node3D            = $Head/Camera3D/WeaponHolder
+@onready var player_model: Node3D      = $PlayerModel
+@onready var third_person_cam: Camera3D = $ThirdPersonArm/ThirdPersonCam
 
 var hud: CanvasLayer = null
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
+var is_third_person: bool = false
 
 # ───────────────────────────────────────────────────────────────────────────
 func _ready() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	hud = get_parent().get_node_or_null("HUD")
 	GameManager.create_player_stats()
+	GameManager.player_node = self
 	max_health = float(GameManager.stats.max_health)
 	max_mana   = float(GameManager.stats.max_mana)
 	health     = max_health
 	mana       = 0.0
 	_emit_all_stats()
+	_add_test_items()
+
+func _add_test_items() -> void:
+	var ItemClass := preload("res://scripts/resources/item.gd")
+
+	var potion := ItemClass.new()
+	potion.id           = "health_potion"
+	potion.display_name = "Health Potion"
+	potion.grid_size    = Vector2i(1, 1)
+	potion.weight       = 0.3
+	potion.rarity       = ItemClass.Rarity.COMMON
+	potion.item_type    = ItemClass.ItemType.CONSUMABLE
+	potion.description  = "Restores 10 HP. Cannot exceed max health."
+	GameManager.inventory.add_item(potion, Vector2i(0, 0))
+
+	var potion2 := ItemClass.new()
+	potion2.id           = "health_potion"
+	potion2.display_name = "Health Potion"
+	potion2.grid_size    = Vector2i(1, 1)
+	potion2.weight       = 0.3
+	potion2.rarity       = ItemClass.Rarity.COMMON
+	potion2.item_type    = ItemClass.ItemType.CONSUMABLE
+	potion2.description  = "Restores 10 HP. Cannot exceed max health."
+	GameManager.inventory.add_item(potion2, Vector2i(1, 0))
+
+	var sword := ItemClass.new()
+	sword.id           = "iron_sword"
+	sword.display_name = "Iron Sword"
+	sword.grid_size    = Vector2i(1, 3)
+	sword.weight       = 3.5
+	sword.rarity       = ItemClass.Rarity.COMMON
+	sword.item_type    = ItemClass.ItemType.WEAPON
+	sword.description  = "A basic iron sword."
+	GameManager.inventory.add_item(sword, Vector2i(2, 0))
+
+	var armor := ItemClass.new()
+	armor.id           = "leather_armor"
+	armor.display_name = "Leather Armor"
+	armor.grid_size    = Vector2i(2, 2)
+	armor.weight       = 5.0
+	armor.rarity       = ItemClass.Rarity.UNCOMMON
+	armor.item_type    = ItemClass.ItemType.ARMOR
+	armor.description  = "Light armor offering modest protection."
+	GameManager.inventory.add_item(armor, Vector2i(4, 0))
 
 func _emit_all_stats() -> void:
 	GameManager.player_health_changed.emit(health, max_health)
@@ -127,6 +175,10 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle_inventory()
 	if event.is_action_pressed("open_map"):
 		_toggle_map()
+	if event.is_action_pressed("player_info"):
+		_toggle_player_info()
+	if event.is_action_pressed("toggle_camera"):
+		_toggle_camera()
 
 # ───────────────────────────────────────────────────────────────────────────
 func _physics_process(delta: float) -> void:
@@ -316,6 +368,17 @@ func _toggle_inventory() -> void:
 	if hud:
 		hud.toggle_inventory()
 
+func _toggle_player_info() -> void:
+	if hud:
+		hud.toggle_player_info()
+
+func _toggle_camera() -> void:
+	is_third_person = not is_third_person
+	camera.current           = not is_third_person
+	third_person_cam.current = is_third_person
+	player_model.visible     = is_third_person
+	weapon.visible           = not is_third_person
+
 func _toggle_map() -> void:
 	if hud:
 		hud.toggle_map()
@@ -345,4 +408,5 @@ func drink(thirst_restore: float) -> void:
 
 func _die() -> void:
 	state = State.DEAD
-	print("Player died!")
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	GameManager.player_died.emit()

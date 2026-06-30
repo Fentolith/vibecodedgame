@@ -1,12 +1,16 @@
-[gd_scene load_steps=2 format=3 uid="uid://hud00001"]
+[gd_scene load_steps=6 format=3 uid="uid://hud00001"]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://scripts/ui/inventory_ui.gd" id="2_inv"]
+[ext_resource type="Script" path="res://scripts/ui/player_info_ui.gd" id="3_pinfo"]
+[ext_resource type="Script" path="res://scripts/ui/loot_ui.gd" id="4_loot"]
+[ext_resource type="Script" path="res://scripts/ui/orb_ui.gd" id="5_orb"]
 
 [node name="HUD" type="CanvasLayer"]
 groups = ["hud"]
 script = ExtResource("1_hud")
 
-[node name="HealthOrb" type="TextureProgressBar" parent="."]
+[node name="HealthOrb" type="Control" parent="."]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
@@ -14,67 +18,31 @@ anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -350.0
 offset_top = -120.0
-offset_right = -250.0
-offset_bottom = -20.0
+offset_right = -240.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
-size_flags_horizontal = 4
-value = 100.0
-fill_mode = 3
-tint_progress = Color(0.8, 0.1, 0.1, 0.85)
-tint_under = Color(0.2, 0.05, 0.05, 0.6)
+script = ExtResource("5_orb")
+fill_color = Color(0.85, 0.08, 0.08, 1.0)
+bg_color = Color(0.2, 0.2, 0.2, 0.9)
+label_text = "HP"
 
-[node name="HealthLabel" type="Label" parent="HealthOrb"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -10.0
-offset_right = 20.0
-offset_bottom = 10.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "HP"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ManaOrb" type="TextureProgressBar" parent="."]
+[node name="ManaOrb" type="Control" parent="."]
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = 250.0
+offset_left = 240.0
 offset_top = -120.0
 offset_right = 350.0
-offset_bottom = -20.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 0
-size_flags_horizontal = 4
-value = 100.0
-fill_mode = 3
-tint_progress = Color(0.1, 0.2, 0.9, 0.85)
-tint_under = Color(0.05, 0.05, 0.2, 0.6)
-
-[node name="ManaLabel" type="Label" parent="ManaOrb"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -10.0
-offset_right = 20.0
-offset_bottom = 10.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "MP"
-horizontal_alignment = 1
-vertical_alignment = 1
+script = ExtResource("5_orb")
+fill_color = Color(0.1, 0.25, 0.95, 1.0)
+bg_color = Color(0.2, 0.2, 0.2, 0.9)
+label_text = "MP"
 
 [node name="StaminaBar" type="ProgressBar" parent="."]
 anchors_preset = 7
@@ -132,50 +100,15 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+script = ExtResource("2_inv")
 
 [node name="Background" type="ColorRect" parent="InventoryOverlay"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.75)
-
-[node name="Label" type="Label" parent="InventoryOverlay"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -40.0
-offset_right = 200.0
-offset_bottom = 40.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 48
-text = "INVENTORY"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="HintLabel" type="Label" parent="InventoryOverlay"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = 20.0
-offset_right = 200.0
-offset_bottom = 50.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_font_sizes/font_size = 18
-modulate = Color(0.7, 0.7, 0.7, 1)
-text = "[TAB] to close — full UI coming later"
-horizontal_alignment = 1
-vertical_alignment = 1
+color = Color(0, 0, 0, 0.78)
+mouse_filter = 1
 
 [node name="EscMenu" type="Control" parent="."]
 visible = false
@@ -216,6 +149,17 @@ text = "PAUSED"
 layout_mode = 2
 custom_minimum_size = Vector2(220, 44)
 text = "Resume"
+
+[node name="ControlsButton" type="Button" parent="EscMenu/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 44)
+text = "Controls"
+
+[node name="DevToolsButton" type="Button" parent="EscMenu/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 44)
+modulate = Color(0.6, 1.0, 0.6, 1)
+text = "Dev Tools"
 
 [node name="QuitButton" type="Button" parent="EscMenu/VBoxContainer"]
 layout_mode = 2
@@ -272,3 +216,402 @@ modulate = Color(0.7, 0.7, 0.7, 1)
 text = "[M] to close — full UI coming later"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="MoodleContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -170.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 110.0
+grow_horizontal = 0
+
+[node name="HungryMoodle" type="Label" parent="MoodleContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+modulate = Color(1.0, 0.78, 0.1, 1)
+text = "⚠ HUNGRY"
+horizontal_alignment = 2
+
+[node name="ThirstyMoodle" type="Label" parent="MoodleContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+modulate = Color(0.25, 0.65, 1.0, 1)
+text = "⚠ THIRSTY"
+horizontal_alignment = 2
+
+[node name="DeathScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="DeathScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0, 0.0, 0.0, 0.88)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DeathScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -130.0
+offset_top = -110.0
+offset_right = 130.0
+offset_bottom = 110.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="DeathScreen/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+modulate = Color(0.85, 0.1, 0.1, 1)
+text = "YOU DIED"
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="DeathScreen/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(260, 48)
+text = "Return to Main Menu"
+
+[node name="QuitButton" type="Button" parent="DeathScreen/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(260, 48)
+text = "Quit Game"
+
+[node name="PlayerInfoOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("3_pinfo")
+
+[node name="Background" type="ColorRect" parent="PlayerInfoOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.78)
+mouse_filter = 1
+
+[node name="DevToolsMenu" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="DevToolsMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.82)
+mouse_filter = 1
+
+[node name="Panel" type="PanelContainer" parent="DevToolsMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -160.0
+offset_top = -160.0
+offset_right = 160.0
+offset_bottom = 160.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="DevToolsMenu/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="TitleLabel" type="Label" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+modulate = Color(0.6, 1.0, 0.6, 1)
+text = "DEV TOOLS"
+horizontal_alignment = 1
+
+[node name="ZeroHungerButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Set Hunger to 0"
+
+[node name="ZeroThirstButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Set Thirst to 0"
+
+[node name="FullHealButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Full Heal"
+
+[node name="ZeroHPButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Set HP to 0"
+
+[node name="CloseButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Close"
+
+[node name="ControlsMenu" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Background" type="ColorRect" parent="ControlsMenu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.88)
+mouse_filter = 1
+
+[node name="Panel" type="PanelContainer" parent="ControlsMenu"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -310.0
+offset_top = -300.0
+offset_right = 310.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="ControlsMenu/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "CONTROLS"
+horizontal_alignment = 1
+
+[node name="HSep" type="HSeparator" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+
+[node name="Grid" type="GridContainer" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 8
+
+[node name="L1" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Move"
+[node name="V1" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "W / A / S / D"
+
+[node name="L2" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Sprint"
+[node name="V2" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Left Shift"
+
+[node name="L3" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Crouch"
+[node name="V3" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Left Ctrl"
+
+[node name="L4" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Jump"
+[node name="V4" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Space"
+
+[node name="L5" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Peek Left / Right"
+[node name="V5" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Q / E"
+
+[node name="L6" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Interact"
+[node name="V6" type="Label" parent="ControlsMenu/Panel/VBox/Grid"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "F"
+
+[node name="HSep2" type="HSeparator" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+
+[node name="CombatLabel" type="Label" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Combat"
+horizontal_alignment = 1
+
+[node name="Grid2" type="GridContainer" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 8
+
+[node name="LC1" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Regular Attack"
+[node name="VC1" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Left Click"
+
+[node name="LC2" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Quick Attack (Poke)"
+[node name="VC2" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Middle Mouse"
+
+[node name="LC3" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Heavy Attack"
+[node name="VC3" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Hold Left Click (0.5s+)"
+
+[node name="LC4" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Block / Parry"
+[node name="VC4" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Hold Right Click"
+
+[node name="HSep3" type="HSeparator" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+
+[node name="Grid3" type="GridContainer" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 40
+theme_override_constants/v_separation = 8
+
+[node name="LM1" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Inventory"
+[node name="VM1" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "TAB"
+
+[node name="LM2" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Character Info"
+[node name="VM2" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "C"
+
+[node name="LM3" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Map"
+[node name="VM3" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "M"
+
+[node name="LM4" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Pause Menu"
+[node name="VM4" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "ESC"
+
+[node name="LM5" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "3rd Person Toggle"
+[node name="VM5" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "F3"
+
+[node name="CloseButton" type="Button" parent="ControlsMenu/Panel/VBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(580, 44)
+text = "Back"
+
+[node name="LootOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("4_loot")
+
+[node name="Background" type="ColorRect" parent="LootOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.72)
+mouse_filter = 1

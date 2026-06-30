@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://testdung1"]
+[gd_scene load_steps=17 format=3 uid="uid://testdung1"]
 
 [ext_resource type="PackedScene" uid="uid://player001" path="res://scenes/player/player.tscn" id="1_player"]
 [ext_resource type="PackedScene" uid="uid://hud00001" path="res://scenes/ui/hud.tscn" id="2_hud"]
+[ext_resource type="PackedScene" uid="uid://slime001" path="res://scenes/entities/slime.tscn" id="3_slime"]
 
 [sub_resource type="StandardMaterial3D" id="mat_floor"]
 albedo_color = Color(0.15, 0.12, 0.1, 1)
@@ -16,30 +17,38 @@ albedo_color = Color(0.1, 0.08, 0.07, 1)
 roughness = 0.95
 
 [sub_resource type="BoxMesh" id="mesh_floor"]
-size = Vector3(20, 0.5, 20)
+size = Vector3(80, 0.5, 80)
 
 [sub_resource type="BoxShape3D" id="shape_floor"]
-size = Vector3(20, 0.5, 20)
+size = Vector3(80, 0.5, 80)
 
 [sub_resource type="BoxMesh" id="mesh_wall_ns"]
-size = Vector3(20, 4, 0.5)
+size = Vector3(80, 4, 0.5)
 
 [sub_resource type="BoxShape3D" id="shape_wall_ns"]
-size = Vector3(20, 4, 0.5)
+size = Vector3(80, 4, 0.5)
 
 [sub_resource type="BoxMesh" id="mesh_wall_ew"]
-size = Vector3(0.5, 4, 20)
+size = Vector3(0.5, 4, 80)
 
 [sub_resource type="BoxShape3D" id="shape_wall_ew"]
-size = Vector3(0.5, 4, 20)
+size = Vector3(0.5, 4, 80)
 
 [sub_resource type="BoxMesh" id="mesh_ceiling"]
-size = Vector3(20, 0.5, 20)
+size = Vector3(80, 0.5, 80)
 
 [sub_resource type="BoxShape3D" id="shape_ceiling"]
-size = Vector3(20, 0.5, 20)
+size = Vector3(80, 0.5, 80)
+
+[sub_resource type="Environment" id="Env_dungeon"]
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.45, 0.35, 1)
+ambient_light_energy = 1.2
 
 [node name="TestDungeon" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_dungeon")
 
 [node name="Player" parent="." instance=ExtResource("1_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
@@ -48,8 +57,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 10, 0)
-light_color = Color(0.3, 0.25, 0.2, 1)
-light_energy = 0.6
+light_color = Color(0.55, 0.48, 0.38, 1)
+light_energy = 1.4
 shadow_enabled = true
 
 [node name="Floor" type="StaticBody3D" parent="."]
@@ -66,45 +75,45 @@ shape = SubResource("shape_floor")
 [node name="WallNorth" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WallNorth"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -40)
 mesh = SubResource("mesh_wall_ns")
 surface_material_override/0 = SubResource("mat_wall")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WallNorth"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -40)
 shape = SubResource("shape_wall_ns")
 
 [node name="WallSouth" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WallSouth"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 40)
 mesh = SubResource("mesh_wall_ns")
 surface_material_override/0 = SubResource("mat_wall")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WallSouth"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 40)
 shape = SubResource("shape_wall_ns")
 
 [node name="WallEast" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WallEast"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2, 0)
 mesh = SubResource("mesh_wall_ew")
 surface_material_override/0 = SubResource("mat_wall")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WallEast"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2, 0)
 shape = SubResource("shape_wall_ew")
 
 [node name="WallWest" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="WallWest"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 2, 0)
 mesh = SubResource("mesh_wall_ew")
 surface_material_override/0 = SubResource("mat_wall")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="WallWest"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 2, 0)
 shape = SubResource("shape_wall_ew")
 
 [node name="Ceiling" type="StaticBody3D" parent="."]
@@ -118,37 +127,47 @@ surface_material_override/0 = SubResource("mat_ceiling")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.25, 0)
 shape = SubResource("shape_ceiling")
 
+
 [node name="TorchLight1" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, -30)
 light_color = Color(1, 0.7, 0.3, 1)
-light_energy = 5.0
-omni_range = 10.0
-omni_attenuation = 1.2
+light_energy = 9.0
+omni_range = 20.0
+omni_attenuation = 1.0
 
 [node name="TorchLight2" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -30)
 light_color = Color(1, 0.7, 0.3, 1)
-light_energy = 5.0
-omni_range = 10.0
-omni_attenuation = 1.2
+light_energy = 9.0
+omni_range = 20.0
+omni_attenuation = 1.0
 
 [node name="TorchLight3" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 3, 30)
 light_color = Color(1, 0.65, 0.25, 1)
-light_energy = 4.5
-omni_range = 10.0
-omni_attenuation = 1.2
+light_energy = 9.0
+omni_range = 20.0
+omni_attenuation = 1.0
 
 [node name="TorchLight4" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 8)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, 30)
 light_color = Color(1, 0.65, 0.25, 1)
-light_energy = 4.5
-omni_range = 10.0
-omni_attenuation = 1.2
+light_energy = 9.0
+omni_range = 20.0
+omni_attenuation = 1.0
 
 [node name="CenterLight" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 light_color = Color(0.9, 0.6, 0.3, 1)
-light_energy = 3.0
-omni_range = 14.0
-omni_attenuation = 1.5
+light_energy = 6.0
+omni_range = 24.0
+omni_attenuation = 1.2
+
+[node name="Slime1" parent="." instance=ExtResource("3_slime")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.325, -12)
+
+[node name="Slime2" parent="." instance=ExtResource("3_slime")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.325, 10)
+
+[node name="Slime3" parent="." instance=ExtResource("3_slime")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.325, 15)
