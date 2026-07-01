@@ -59,13 +59,23 @@ func _build_ui() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	outer.add_child(title)
 
+	outer.add_child(_separator())
+
 	# ── Middle row: grid + equipment ─────────────────────────────────────────
 	var hbox := HBoxContainer.new()
 	hbox.add_theme_constant_override("separation", 24)
 	outer.add_child(hbox)
 
 	_build_grid(hbox)
+
+	var vsep := VSeparator.new()
+	vsep.add_theme_color_override("color", Color(0.50, 0.46, 0.40, 1.0))
+	vsep.add_theme_constant_override("separation", 2)
+	hbox.add_child(vsep)
+
 	_build_equipment_panel(hbox)
+
+	outer.add_child(_separator())
 
 	# ── Bottom row: weight + item info ───────────────────────────────────────
 	var bottom := VBoxContainer.new()
@@ -97,17 +107,33 @@ func _build_ui() -> void:
 	_context_menu.id_pressed.connect(_on_context_id_pressed)
 	add_child(_context_menu)
 
+func _separator() -> HSeparator:
+	var sep := HSeparator.new()
+	sep.add_theme_color_override("color", Color(0.50, 0.46, 0.40, 1.0))
+	sep.add_theme_constant_override("separation", 2)
+	return sep
+
+func _cell_style() -> StyleBoxFlat:
+	var s := StyleBoxFlat.new()
+	s.bg_color          = Color(0.12, 0.12, 0.14, 1.0)
+	s.border_color      = Color(0.45, 0.42, 0.38, 1.0)
+	s.set_border_width_all(1)
+	s.set_corner_radius_all(2)
+	return s
+
 func _build_grid(parent: Control) -> void:
 	_grid_root = Control.new()
 	_grid_root.custom_minimum_size = Vector2(COLS * CELL_SIZE, ROWS * CELL_SIZE)
 	parent.add_child(_grid_root)
 
+	var style := _cell_style()
 	for row in ROWS:
 		for col in COLS:
 			var cell := Panel.new()
 			cell.position     = Vector2(col * CELL_SIZE, row * CELL_SIZE)
 			cell.size         = Vector2(CELL_SIZE - 2, CELL_SIZE - 2)
 			cell.mouse_filter = Control.MOUSE_FILTER_STOP
+			cell.add_theme_stylebox_override("panel", style)
 			var gp := Vector2i(col, row)
 			cell.gui_input.connect(_on_cell_input.bind(gp))
 			cell.mouse_entered.connect(_on_cell_hover.bind(gp))
@@ -249,7 +275,10 @@ func _on_item_input(event: InputEvent, item: Resource) -> void:
 	if not mb.pressed:
 		return
 	if mb.button_index == MOUSE_BUTTON_LEFT:
-		_pick_up(item)
+		if _dragging_item:
+			_swap_with(item)
+		else:
+			_pick_up(item)
 	elif mb.button_index == MOUSE_BUTTON_RIGHT:
 		_open_context_menu(item)
 
@@ -279,6 +308,21 @@ func _pick_up(item: Resource) -> void:
 	_drag_rect.color   = RARITY_COLORS.get(it.rarity, Color.WHITE)
 	_drag_rect.color.a = 0.7
 	_drag_rect.visible = true
+	refresh()
+
+func _swap_with(clicked_item: Resource) -> void:
+	var swap_pos: Vector2i = GameManager.inventory.get_position_of(clicked_item)
+	GameManager.inventory.remove_item(clicked_item)
+	if GameManager.inventory.add_item(_dragging_item, swap_pos):
+		# Place succeeded — now drag the clicked item instead
+		_dragging_item = clicked_item
+		var it := clicked_item as ItemClass
+		_drag_rect.size    = Vector2(it.grid_size.x * CELL_SIZE - 4, it.grid_size.y * CELL_SIZE - 4)
+		_drag_rect.color   = RARITY_COLORS.get(it.rarity, Color.WHITE)
+		_drag_rect.color.a = 0.7
+	else:
+		# Doesn't fit (size mismatch) — put clicked item back, keep original drag
+		GameManager.inventory.add_item(clicked_item, swap_pos)
 	refresh()
 
 func _try_place(item: Resource, cell_pos: Vector2i) -> void:
@@ -317,6 +361,7 @@ func _on_context_id_pressed(id: int) -> void:
 				if old:
 					_auto_place(old)
 				GameManager.equipment.equip(slot, _context_item)
+				GameManager.equipment_changed.emit(slot, _context_item)
 				refresh()
 		2: # Drop
 			GameManager.drop_item(_context_item)
@@ -331,6 +376,7 @@ func _try_equip_to_slot(item: Resource, slot_name: String) -> void:
 	if old:
 		_auto_place(old)
 	GameManager.equipment.equip(slot_name, item)
+	GameManager.equipment_changed.emit(slot_name, item)
 	_dragging_item     = null
 	_drag_rect.visible = false
 	refresh()
@@ -339,6 +385,7 @@ func _unequip_slot(slot_name: String) -> void:
 	var item: Resource = GameManager.equipment.unequip(slot_name)
 	if item:
 		_auto_place(item)
+		GameManager.equipment_changed.emit(slot_name, null)
 		refresh()
 
 func _auto_place(item: Resource) -> void:
@@ -354,8 +401,16 @@ func _show_info(item: Resource) -> void:
 	var it           := item as ItemClass
 	var rarity_names := ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
 	var col: String = (RARITY_COLORS.get(it.rarity, Color.WHITE) as Color).to_html(false)
-	_info_label.text  = "[color=#%s][b]%s[/b][/color]   [i]%s[/i]   %.1f kg\n%s" % [
-		col, it.display_name, rarity_names[it.rarity], it.weight, it.description
+	var extra := ""
+	if it.item_type == ItemClass.ItemType.WEAPON_MELEE or it.item_type == ItemClass.ItemType.WEAPON_RANGED:
+		if it.damage_bonus > 0:
+			extra += "\n[color=#ffdd88]+%d Damage[/color]" % it.damage_bonus
+		if it.attack_speed_mult != 1.0:
+			extra += "  [color=#88ddff]%.1fx Speed[/color]" % it.attack_speed_mult
+	if it.armor_bonus > 0:
+		extra += "\n[color=#88ffaa]+%d Armor[/color]" % it.armor_bonus
+	_info_label.text  = "[color=#%s][b]%s[/b][/color]   [i]%s[/i]   %.1f kg\n%s%s" % [
+		col, it.display_name, rarity_names[it.rarity], it.weight, it.description, extra
 	]
 
 # ─────────────────────────────────────────────────────────────────────────────

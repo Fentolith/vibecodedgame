@@ -1,9 +1,8 @@
 extends Control
 
-const PADDING:    float = 20.0
-const DUNGEON_SZ: float = 80.0
-const ZOOM_MIN:   float = 0.5
-const ZOOM_MAX:   float = 4.0
+const PADDING:  float = 20.0
+const ZOOM_MIN: float = 0.5
+const ZOOM_MAX: float = 4.0
 
 # Room-type colours
 const COL_FOG      := Color(0.08, 0.08, 0.08, 1.0)
@@ -31,11 +30,24 @@ func _ready() -> void:
 		if child is Label:
 			child.visible = false
 
+func _dungeon_bounds() -> Rect2:
+	var rooms: Array = GameManager.dungeon_rooms
+	if rooms.is_empty():
+		return Rect2(0, 0, 80, 80)
+	var bounds: Rect2 = rooms[0].rect as Rect2
+	for room in rooms:
+		bounds = bounds.merge(room.rect as Rect2)
+	for corr in GameManager.dungeon_corridors:
+		bounds = bounds.merge(corr.rect as Rect2)
+	return bounds
+
 func _reset_view() -> void:
-	var usable: float = minf(size.x, size.y) - PADDING * 2.0
-	_base_scale = usable / DUNGEON_SZ
+	var bounds: Rect2  = _dungeon_bounds()
+	var usable_w: float = size.x - PADDING * 2.0
+	var usable_h: float = size.y - PADDING * 2.0
+	_base_scale = minf(usable_w / bounds.size.x, usable_h / bounds.size.y)
 	_zoom       = 1.0
-	_pan        = Vector2.ZERO
+	_pan        = Vector2(PADDING, PADDING) - Vector2(bounds.position.x, bounds.position.y) * _base_scale
 
 func _on_visibility() -> void:
 	if visible:
@@ -43,11 +55,8 @@ func _on_visibility() -> void:
 		# Centre view on player
 		var player: Node3D = GameManager.player_node
 		if player:
-			var world_centre := Vector2(
-				player.global_position.x * _base_scale,
-				player.global_position.z * _base_scale
-			)
-			_pan = size * 0.5 - world_centre
+			var s: float = _base_scale * _zoom
+			_pan = size * 0.5 - Vector2(player.global_position.x * s, player.global_position.z * s)
 
 func _process(_delta: float) -> void:
 	_update_explored()

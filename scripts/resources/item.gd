@@ -27,6 +27,11 @@ enum ItemType {
 @export var description: String = ""
 @export var stackable: bool = false
 @export var stack_count: int = 1
+@export var nutrition: float = 0.0   # hunger/thirst restore for food/water
+@export var damage_bonus: int = 0
+@export var attack_speed_mult: float = 1.0
+@export var weapon_visual_id: String = ""   # "fist","sword","dagger","axe","staff","bow"
+@export var armor_bonus: int = 0
 
 func get_equipment_slot() -> String:
 	match item_type:

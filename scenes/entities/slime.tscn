@@ -2,18 +2,34 @@
 
 [ext_resource type="Script" path="res://scripts/entities/slime.gd" id="1_slime"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_slime"]
-size = Vector3(0.65, 0.65, 0.65)
+[sub_resource type="SphereShape3D" id="SphereShape3D_slime"]
+radius = 0.38
 
-[sub_resource type="BoxMesh" id="BoxMesh_slime"]
-size = Vector3(0.65, 0.65, 0.65)
+[sub_resource type="SphereMesh" id="SphereMesh_body"]
+radius = 0.38
+height = 0.52
+
+[sub_resource type="SphereMesh" id="SphereMesh_eye_l"]
+radius = 0.07
+height = 0.14
+
+[sub_resource type="SphereMesh" id="SphereMesh_eye_r"]
+radius = 0.07
+height = 0.14
 
 [sub_resource type="StandardMaterial3D" id="Mat_slime"]
-albedo_color = Color(0.12, 0.78, 0.18, 1)
-roughness = 0.5
+albedo_color = Color(0.10, 0.78, 0.18, 0.88)
+roughness = 0.25
+metallic = 0.05
 emission_enabled = true
-emission = Color(0.05, 0.28, 0.05, 1)
-emission_energy_multiplier = 0.4
+emission = Color(0.04, 0.30, 0.06, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="StandardMaterial3D" id="Mat_eye"]
+albedo_color = Color(0.9, 0.95, 0.4, 1)
+emission_enabled = true
+emission = Color(0.6, 0.7, 0.1, 1)
+emission_energy_multiplier = 1.2
 
 [node name="Slime" type="CharacterBody3D"]
 collision_layer = 4
@@ -21,13 +37,23 @@ collision_mask = 1
 script = ExtResource("1_slime")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.325, 0)
-shape = SubResource("BoxShape3D_slime")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+shape = SubResource("SphereShape3D_slime")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.325, 0)
-mesh = SubResource("BoxMesh_slime")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.38, 0)
+mesh = SubResource("SphereMesh_body")
 surface_material_override/0 = SubResource("Mat_slime")
+
+[node name="EyeL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.13, 0.52, 0.30)
+mesh = SubResource("SphereMesh_eye_l")
+surface_material_override/0 = SubResource("Mat_eye")
+
+[node name="EyeR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.13, 0.52, 0.30)
+mesh = SubResource("SphereMesh_eye_r")
+surface_material_override/0 = SubResource("Mat_eye")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
 path_desired_distance = 0.5
@@ -35,7 +61,7 @@ target_desired_distance = 1.0
 avoidance_enabled = true
 
 [node name="HealthBar" type="Label3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.88, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.92, 0)
 visible = false
 billboard = 3
 no_depth_test = true

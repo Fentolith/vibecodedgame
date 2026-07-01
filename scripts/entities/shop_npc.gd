@@ -1,4 +1,4 @@
 extends StaticBody3D
 
 func interact() -> void:
-	GameManager.begin_floor_transition()
+	GameManager.shop_opened.emit()

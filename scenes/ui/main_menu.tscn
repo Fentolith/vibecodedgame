@@ -37,6 +37,12 @@ layout_mode = 2
 custom_minimum_size = Vector2(220, 50)
 text = "Start Game"
 
+[node name="ContinueButton" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 50)
+visible = false
+text = "Continue"
+
 [node name="QuitButton" type="Button" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(220, 50)

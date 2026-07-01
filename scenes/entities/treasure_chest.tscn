@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/loot_bag.gd" id="1_bag"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_chest"]
+size = Vector3(0.80, 0.52, 0.52)
+
+[sub_resource type="BoxMesh" id="BoxMesh_base"]
+size = Vector3(0.80, 0.36, 0.52)
+
+[sub_resource type="BoxMesh" id="BoxMesh_lid"]
+size = Vector3(0.80, 0.18, 0.52)
+
+[sub_resource type="BoxMesh" id="BoxMesh_latch"]
+size = Vector3(0.10, 0.10, 0.06)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_latch_knob"]
+top_radius = 0.04
+bottom_radius = 0.04
+height = 0.07
+
+[sub_resource type="StandardMaterial3D" id="Mat_wood"]
+albedo_color = Color(0.38, 0.22, 0.08, 1)
+roughness = 0.88
+
+[sub_resource type="StandardMaterial3D" id="Mat_metal"]
+albedo_color = Color(0.72, 0.58, 0.14, 1)
+roughness = 0.5
+metallic = 0.6
+emission_enabled = true
+emission = Color(0.45, 0.35, 0.05, 1)
+emission_energy_multiplier = 0.5
+
+[node name="TreasureChest" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_bag")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.26, 0)
+shape = SubResource("BoxShape3D_chest")
+
+[node name="Base" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.18, 0)
+mesh = SubResource("BoxMesh_base")
+surface_material_override/0 = SubResource("Mat_wood")
+
+[node name="Lid" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+mesh = SubResource("BoxMesh_lid")
+surface_material_override/0 = SubResource("Mat_wood")
+
+[node name="Latch" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.33, 0.27)
+mesh = SubResource("BoxMesh_latch")
+surface_material_override/0 = SubResource("Mat_metal")
+
+[node name="LatchKnob" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.33, 0.31)
+mesh = SubResource("CylinderMesh_latch_knob")
+surface_material_override/0 = SubResource("Mat_metal")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
+light_color = Color(1.0, 0.85, 0.2, 1.0)
+light_energy = 3.5
+omni_range = 5.0
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.80, 0)
+billboard = 3
+no_depth_test = true
+font_size = 10
+text = "[F] Open Chest"
+modulate = Color(1.0, 0.88, 0.3, 1)

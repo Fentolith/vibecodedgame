@@ -1,0 +1,61 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/bat.gd" id="1_bat"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bat"]
+size = Vector3(0.55, 0.22, 0.40)
+
+[sub_resource type="BoxMesh" id="BoxMesh_body"]
+size = Vector3(0.24, 0.22, 0.28)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wing_l"]
+size = Vector3(0.32, 0.06, 0.36)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wing_r"]
+size = Vector3(0.32, 0.06, 0.36)
+
+[sub_resource type="StandardMaterial3D" id="Mat_bat_body"]
+albedo_color = Color(0.12, 0.06, 0.18, 1)
+roughness = 0.9
+emission_enabled = true
+emission = Color(0.28, 0.04, 0.38, 1)
+emission_energy_multiplier = 0.6
+
+[sub_resource type="StandardMaterial3D" id="Mat_bat_wing"]
+albedo_color = Color(0.22, 0.08, 0.30, 1)
+roughness = 0.95
+emission_enabled = true
+emission = Color(0.18, 0.02, 0.26, 1)
+emission_energy_multiplier = 0.3
+
+[node name="Bat" type="RigidBody3D"]
+collision_layer = 4
+collision_mask = 3
+gravity_scale = 0.0
+script = ExtResource("1_bat")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_bat")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_body")
+surface_material_override/0 = SubResource("Mat_bat_body")
+
+[node name="WingL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.28, 0, 0.04)
+mesh = SubResource("BoxMesh_wing_l")
+surface_material_override/0 = SubResource("Mat_bat_wing")
+
+[node name="WingR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.28, 0, 0.04)
+mesh = SubResource("BoxMesh_wing_r")
+surface_material_override/0 = SubResource("Mat_bat_wing")
+
+[node name="HealthBar" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+visible = false
+billboard = 3
+no_depth_test = true
+font_size = 12
+text = "████████"
+modulate = Color(0.70, 0.30, 0.85, 1)

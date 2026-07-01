@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://hud00001"]
+[gd_scene load_steps=10 format=3 uid="uid://hud00001"]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_hud"]
 [ext_resource type="Script" path="res://scripts/ui/inventory_ui.gd" id="2_inv"]
@@ -6,6 +6,9 @@
 [ext_resource type="Script" path="res://scripts/ui/loot_ui.gd" id="4_loot"]
 [ext_resource type="Script" path="res://scripts/ui/orb_ui.gd" id="5_orb"]
 [ext_resource type="Script" path="res://scripts/ui/map_overlay.gd" id="6_map"]
+[ext_resource type="Script" path="res://scripts/ui/health_screen.gd" id="7_health"]
+[ext_resource type="Script" path="res://scripts/ui/bank_ui.gd" id="8_bank"]
+[ext_resource type="Script" path="res://scripts/ui/shop_ui.gd" id="9_shop"]
 
 [node name="HUD" type="CanvasLayer"]
 groups = ["hud"]
@@ -207,6 +210,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(220, 44)
 modulate = Color(0.6, 1.0, 0.6, 1)
 text = "Dev Tools"
+
+[node name="SaveButton" type="Button" parent="EscMenu/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(220, 44)
+text = "Save Game"
 
 [node name="QuitButton" type="Button" parent="EscMenu/VBoxContainer"]
 layout_mode = 2
@@ -417,6 +425,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(280, 44)
 text = "Set HP to 0"
 
+[node name="SpawnLockedChestButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(280, 44)
+text = "Spawn Locked Chest (Very Easy)"
+
 [node name="CloseButton" type="Button" parent="DevToolsMenu/Panel/VBoxContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(280, 44)
@@ -585,6 +598,26 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "Hold Right Click"
 
+[node name="LC5" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Ranged Attack"
+[node name="VC5" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "R"
+
+[node name="LC6" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Dodge"
+[node name="VC6" type="Label" parent="ControlsMenu/Panel/VBox/Grid2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Double-tap move direction"
+
 [node name="HSep3" type="HSeparator" parent="ControlsMenu/Panel/VBox"]
 layout_mode = 2
 
@@ -638,8 +671,28 @@ text = "ESC"
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 modulate = Color(0.7, 0.7, 0.7, 1)
-text = "3rd Person Toggle"
+text = "Health / Limb Screen"
 [node name="VM5" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "H"
+
+[node name="LM6" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "Controls"
+[node name="VM6" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "K  (or ESC → Controls)"
+
+[node name="LM7" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+modulate = Color(0.7, 0.7, 0.7, 1)
+text = "3rd Person Toggle"
+[node name="VM7" type="Label" parent="ControlsMenu/Panel/VBox/Grid3"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
 text = "F3"
@@ -663,6 +716,54 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0, 0, 0, 0.72)
+mouse_filter = 1
+
+[node name="ShopOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("9_shop")
+
+[node name="Background" type="ColorRect" parent="ShopOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.80)
+mouse_filter = 1
+
+[node name="BankOverlay" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("8_bank")
+
+[node name="Background" type="ColorRect" parent="BankOverlay"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.80)
+mouse_filter = 1
+
+[node name="HealthScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("7_health")
+
+[node name="Background" type="ColorRect" parent="HealthScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0, 0, 0, 0.78)
 mouse_filter = 1
 
 [node name="FloorLabel" type="Label" parent="."]

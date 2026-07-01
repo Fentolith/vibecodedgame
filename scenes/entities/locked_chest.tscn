@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://locked_chest"]
+
+[ext_resource type="Script" path="res://scripts/entities/locked_chest.gd" id="1_lchest"]
+
+[node name="LockedChest" type="StaticBody3D"]
+script = ExtResource("1_lchest")

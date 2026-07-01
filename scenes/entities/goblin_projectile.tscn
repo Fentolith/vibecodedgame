@@ -1,0 +1,33 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/goblin_projectile.gd" id="1_gproj"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_gproj"]
+radius = 0.09
+
+[sub_resource type="SphereMesh" id="SphereMesh_gproj"]
+radius = 0.09
+height = 0.18
+
+[sub_resource type="StandardMaterial3D" id="Mat_gproj"]
+albedo_color = Color(1.0, 0.45, 0.0, 1)
+emission_enabled = true
+emission = Color(1.0, 0.3, 0.0, 1)
+emission_energy_multiplier = 2.5
+
+[node name="GoblinProjectile" type="Area3D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_gproj")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_gproj")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_gproj")
+surface_material_override/0 = SubResource("Mat_gproj")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+light_color = Color(1.0, 0.4, 0.1, 1)
+light_energy = 1.2
+omni_range = 2.5

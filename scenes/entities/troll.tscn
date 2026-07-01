@@ -1,0 +1,98 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/entities/troll.gd" id="1_troll"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_troll"]
+size = Vector3(1.4, 2.4, 1.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_torso"]
+size = Vector3(1.2, 1.0, 0.80)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hips"]
+size = Vector3(0.9, 0.55, 0.70)
+
+[sub_resource type="BoxMesh" id="BoxMesh_head"]
+size = Vector3(0.65, 0.60, 0.55)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder_l"]
+size = Vector3(0.38, 0.38, 0.38)
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder_r"]
+size = Vector3(0.38, 0.38, 0.38)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leg_l"]
+size = Vector3(0.36, 0.70, 0.36)
+
+[sub_resource type="BoxMesh" id="BoxMesh_leg_r"]
+size = Vector3(0.36, 0.70, 0.36)
+
+[sub_resource type="StandardMaterial3D" id="Mat_troll"]
+albedo_color = Color(0.25, 0.40, 0.15, 1)
+roughness = 0.95
+emission_enabled = true
+emission = Color(0.05, 0.10, 0.02, 1)
+emission_energy_multiplier = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_troll_dark"]
+albedo_color = Color(0.18, 0.30, 0.10, 1)
+roughness = 1.0
+
+[node name="Troll" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_troll")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+shape = SubResource("BoxShape3D_troll")
+
+[node name="Legs" type="Node3D" parent="."]
+
+[node name="LegL" type="MeshInstance3D" parent="Legs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.22, 0.35, 0)
+mesh = SubResource("BoxMesh_leg_l")
+surface_material_override/0 = SubResource("Mat_troll_dark")
+
+[node name="LegR" type="MeshInstance3D" parent="Legs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.22, 0.35, 0)
+mesh = SubResource("BoxMesh_leg_r")
+surface_material_override/0 = SubResource("Mat_troll_dark")
+
+[node name="Hips" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.75, 0)
+mesh = SubResource("BoxMesh_hips")
+surface_material_override/0 = SubResource("Mat_troll_dark")
+
+[node name="Torso" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.38, 0)
+mesh = SubResource("BoxMesh_torso")
+surface_material_override/0 = SubResource("Mat_troll")
+
+[node name="ShoulderL" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.72, 1.62, 0)
+mesh = SubResource("BoxMesh_shoulder_l")
+surface_material_override/0 = SubResource("Mat_troll")
+
+[node name="ShoulderR" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.72, 1.62, 0)
+mesh = SubResource("BoxMesh_shoulder_r")
+surface_material_override/0 = SubResource("Mat_troll")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.20, 0)
+mesh = SubResource("BoxMesh_head")
+surface_material_override/0 = SubResource("Mat_troll")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+path_desired_distance = 0.8
+target_desired_distance = 1.5
+avoidance_enabled = true
+
+[node name="HealthBar" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 0)
+visible = false
+billboard = 3
+no_depth_test = true
+font_size = 14
+text = "TROLL  ██████████"
+modulate = Color(0.3, 0.85, 0.25, 1)
